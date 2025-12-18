@@ -9,6 +9,7 @@ from astrbot.api import logger, AstrBotConfig
 from astrbot.core.platform.sources.aiocqhttp.aiocqhttp_message_event import AiocqhttpMessageEvent 
 import astrbot.api.message_components as Comp
 
+@register("astrbot_plugin_choulaopo", "糯米茨", "随机抽老婆插件", "2.0.7", "https://github.com/aiertana/astrbot-plugin-choulaopo")
 class RandomWifePlugin(Star):
     """
     AstrBot随机抽老婆插件
@@ -22,12 +23,13 @@ class RandomWifePlugin(Star):
     7. 帮助菜单
     8. 输出被抽中成员的头像
     """
-    def __init__(self, context: Context, config: AstrBotConfig): 
+    def __init__(self, context: Context, config: dict = None): 
         """
         插件初始化方法
         """
         super().__init__(context)
-        self.config = config # 保存从框架传入的配置对象，用于后续读取用户配置
+        # 加载配置
+        self.config = config or {}
         
         self.data_dir = os.path.join("data", "plugins", "random_wife") # 构建数据存储目录路径（/bot目录/data/plugins/random_wife）
         self.records_file = os.path.join(self.data_dir, "wife_records.json")
@@ -111,6 +113,7 @@ class RandomWifePlugin(Star):
     @filter.command("今日老婆", alias={'抽老婆'})
     async def draw_wife_with_at_command(self, event: AstrMessageEvent):
         """抽取今日老婆（带@功能），别名"抽老婆" - @版本"""
+        logger.info(f"收到@命令: 今日老婆/抽老婆")
         async for result in self._draw_wife_common(event, with_at=True):
             yield result
     
@@ -136,6 +139,7 @@ class RandomWifePlugin(Star):
     @filter.regex(r'^抽(一)?个老婆$', regex_flags=0)
     async def draw_wife_direct_regex(self, event: AstrMessageEvent):
         """直接文本匹配触发（不带@）"""
+        logger.info(f"收到直接文本匹配: 抽个老婆")
         async for result in self._draw_wife_common(event, with_at=False):
             yield result
     
